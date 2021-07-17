@@ -10,6 +10,7 @@ import tqdm
 import pickle
 import argparse
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.io import loadmat
 from bbox import bbox_overlaps
 from IPython import embed
@@ -270,6 +271,10 @@ def evaluation(pred, gt_path, iou_thresh=0.5):
 
         propose = pr_curve[:, 0]
         recall = pr_curve[:, 1]
+        plt.plot(recall, propose, color ='tab:blue')
+        plt.savefig("save_curve.png",bbox_inches="tight")
+        plt.xlabel("Recall")
+        plt.ylabel("Precision")
 
         ap = voc_ap(recall, propose)
         aps.append(ap)
