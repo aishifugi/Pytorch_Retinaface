@@ -78,8 +78,8 @@ if __name__ == '__main__':
     net = RetinaFace(cfg=cfg, phase = 'test')
     net = load_model(net, args.trained_model, args.cpu)
     net.eval()
-    print('Finished loading model!')
-    print(net)
+    #print('Finished loading model!')
+    #print(net)
     cudnn.benchmark = True
     device = torch.device("cpu" if args.cpu else "cuda")
     net = net.to(device)
@@ -88,12 +88,23 @@ if __name__ == '__main__':
     testset_folder = args.dataset_folder
     testset_list = args.dataset_folder[:-7] + "wider_val.txt"
 
-    with open(testset_list, 'r') as fr:
-        test_dataset = fr.read().split()
-    num_images = len(test_dataset)
+    #with open(testset_list, 'r') as fr:
+        #test_dataset = fr.read().split()
+    #num_images = len(test_dataset)
+
+    test_dataset=[]
+    with open(testset_list,'r') as fr:
+      lines=fr.readlines()
+      for i in lines:
+        if i[0]=="#":
+          test_dataset.append(i[2:-1])
+    num_images=len(test_dataset)
+
+
 
     _t = {'forward_pass': Timer(), 'misc': Timer()}
-
+    #print(testset_folder,testset_list)
+    #print(test_dataset)
     # testing begin
     for i, img_name in enumerate(test_dataset):
         image_path = testset_folder + img_name
@@ -216,4 +227,3 @@ if __name__ == '__main__':
                 os.makedirs("./results/")
             name = "./results/" + str(i) + ".jpg"
             cv2.imwrite(name, img_raw)
-
