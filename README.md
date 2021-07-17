@@ -38,7 +38,7 @@ We also provide a set of Face Detector for edge device in [here](https://github.
 
 ## Installation
 ##### Clone and install
-1. git clone https://github.com/biubug6/Pytorch_Retinaface.git
+1. git clone https://github.com/aishifugi/Pytorch_Retinaface.git
 
 2. Pytorch version 1.1.0+ and torchvision 0.3.0+ are needed.
 
@@ -75,6 +75,7 @@ We trained Mobilenet0.25 on imagenet dataset and get 46.58%  in top 1. If you do
       mobilenet0.25_Final.pth
       mobilenetV1X0.25_pretrain.tar
       Resnet50_Final.pth
+      
 ```
 1. Before training, you can check network configuration (e.g. batch_size, min_sizes and steps etc..) in ``data/config.py and train.py``.
 
@@ -83,6 +84,9 @@ We trained Mobilenet0.25 on imagenet dataset and get 46.58%  in top 1. If you do
   CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py --network resnet50 or
   CUDA_VISIBLE_DEVICES=0 python train.py --network mobile0.25
   ```
+  I used the pretrained model Resnet50_Final.pth by downloading it from my google drive.
+  ./weights/
+      Resnet50_Final.pth
 
 
 ## Evaluation
@@ -91,12 +95,34 @@ We trained Mobilenet0.25 on imagenet dataset and get 46.58%  in top 1. If you do
 ```Shell
 python test_widerface.py --trained_model weight_file --network mobile0.25 or resnet50
 ```
+I modified the code test_widerface.py by appending from line 95-101 as-
+
+test_dataset=[]
+    with open(testset_list,'r') as fr:
+      lines=fr.readlines()
+      for i in lines:
+        if i[0]=="#":
+          test_dataset.append(i[2:-1])
+    num_images=len(test_dataset)
+
+I used !python test_widerface.py --network resnet50 --cpu to generate the txt file.
+Then I downloaded the result in file.zip which contains the test result of validaion dataset in txt format.
+After this step I downloaded file.zip and moved it to widerface_evaluate/widerface_txt.
 2. Evaluate txt results. Demo come from [Here](https://github.com/wondervictor/WiderFace-Evaluation)
 ```Shell
 cd ./widerface_evaluate
 python setup.py build_ext --inplace
 python evaluation.py
 ```
+In order to plot the precision vs. recall curve I needed to make some modification in evaluation.py.Appended from line 274-277 as:
+plt.plot(recall, propose, color ='tab:blue')
+        plt.savefig("save_curve.png",bbox_inches="tight")
+        plt.xlabel("Recall")
+        plt.ylabel("Precision")
+Before that I imported the python library matplotlib as plt.
+The precision vs. recall curve was saved in save_curve.png .
+
+
 3. You can also use widerface official Matlab evaluate demo in [Here](http://mmlab.ie.cuhk.edu.hk/projects/WIDERFace/WiderFace_Results.html)
 ### Evaluation FDDB
 
@@ -127,3 +153,8 @@ author={Deng, Jiankang and Guo, Jia and Yuxiang, Zhou and Jinke Yu and Irene Kot
 booktitle={arxiv},
 year={2019}
 ```
+REFERENCES:
+1.https://drive.google.com/file/d/1iUYvk33zxV2dU-sG6EWUd4KW9YPzhc2n/view?usp=sharing -This is the google drive link of WIDER_VAL.zip which contains the validation images and can be accessed directly from my drive using this link.
+2.https://drive.google.com/file/d/1rX11lpo3xyN8JsJ56r10KPu9IFALRQRX/view?usp=sharing -This is the google drive link of label.txt file of the validation dataset.It will be downloaded and saved as wider_val.txt file in the google colab notebook.
+3.https://drive.google.com/file/d/1pLcsCaDSsfTrG01pm8WR5dCu0dJvzbKR/view?usp=sharing -This is the google drive link of file.zip which contains the result in txt format after testing the model with validation dataset.
+4.https://colab.research.google.com/drive/1lReOo_0j50waqspBcE8zodT4jr3i9CJF?usp=sharing -This is the google drive link of my Retinaface_Pytorch.ipynb google colab notebook.My notebook can be directly accessed using this link.
